@@ -27,10 +27,24 @@ export default async function PlayerPage({
     .map((n) => n[0])
     .join('')
 
-  // Ensure embed URLs use the privacy-enhanced nocookie domain
-  const youtubeEmbedUrl = player.highlight_url
-    ? player.highlight_url.replace('www.youtube.com/embed', 'www.youtube-nocookie.com/embed')
-    : null
+  // Convert any YouTube URL format to nocookie embed, keep Hudl as-is
+  function toEmbedUrl(url: string | null): string | null {
+    if (!url) return null
+    // Already a nocookie embed
+    if (url.includes('youtube-nocookie.com/embed')) return url
+    // Regular embed URL
+    const embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/)
+    if (embedMatch) return `https://www.youtube-nocookie.com/embed/${embedMatch[1]}`
+    // watch?v= or youtu.be/ or shorts/
+    const idMatch = url.match(
+      /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    )
+    if (idMatch) return `https://www.youtube-nocookie.com/embed/${idMatch[1]}`
+    // Hudl or other — return as-is
+    return url
+  }
+
+  const youtubeEmbedUrl = toEmbedUrl(player.highlight_url)
 
   return (
     <div className="min-h-screen">
