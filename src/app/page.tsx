@@ -50,9 +50,12 @@ export default async function Home() {
               >
                 Create Free Profile
               </Link>
-              <button className="border border-white/10 hover:border-white/20 text-white/70 hover:text-white font-medium px-6 py-3 rounded-xl transition-colors text-sm">
+              <Link
+                href="/coaches"
+                className="border border-white/10 hover:border-white/20 text-white/70 hover:text-white font-medium px-6 py-3 rounded-xl transition-colors text-sm"
+              >
                 I&apos;m a Coach →
-              </button>
+              </Link>
             </div>
           </div>
 
