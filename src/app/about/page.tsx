@@ -79,7 +79,7 @@ export default function AboutPage() {
             </div>
             <div>
               <p className="font-medium text-white">Arjun Dabas</p>
-              <p className="text-white/40 text-sm">Founder · Competitive soccer player & developer</p>
+              <p className="text-white/40 text-sm">Founder · Student athlete & developer</p>
             </div>
           </div>
         </div>
