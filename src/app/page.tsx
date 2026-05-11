@@ -1,65 +1,84 @@
-import Image from "next/image";
+import Link from 'next/link'
+import { Users, Search, Shield } from 'lucide-react'
+import { supabase, Player } from '@/lib/supabase'
+import PlayersClient from './players-client'
 
-export default function Home() {
+async function getPlayers(): Promise<Player[]> {
+  const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Failed to fetch players:', error.message)
+    return []
+  }
+  return data as Player[]
+}
+
+export default async function Home() {
+  const players = await getPlayers()
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen">
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-white/5">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-950/30 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1 mb-6">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-green-400 text-xs font-medium">
+                {players.length > 0 ? `${players.length} verified players` : '500+ verified players'}
+              </span>
+            </div>
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-none mb-4">
+              Get{' '}
+              <span className="gradient-text">Recruited.</span>
+              <br />
+              Get Seen.
+            </h1>
+            <p className="text-white/50 text-lg leading-relaxed mb-8">
+              The recruiting platform built for the next generation of soccer
+              talent. Create your profile, upload highlights, and connect with
+              college coaches.
+            </p>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/create-profile"
+                className="bg-green-500 hover:bg-green-400 text-black font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
+              >
+                Create Free Profile
+              </Link>
+              <button className="border border-white/10 hover:border-white/20 text-white/70 hover:text-white font-medium px-6 py-3 rounded-xl transition-colors text-sm">
+                I&apos;m a Coach →
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-8 mt-16">
+            {[
+              { icon: Users, label: 'Players', value: `${players.length}` },
+              { icon: Search, label: 'Coach Views', value: '12k+' },
+              { icon: Shield, label: 'Commitments', value: `${players.filter(p => p.committed).length}` },
+            ].map(({ icon: Icon, label, value }) => (
+              <div key={label}>
+                <p className="text-2xl font-bold text-white">{value}</p>
+                <p className="text-white/40 text-sm flex items-center gap-1.5 mt-0.5">
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </section>
+
+      {/* Player Grid */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h2 className="text-xl font-semibold text-white mb-6">Browse Players</h2>
+        <PlayersClient players={players} />
+      </section>
     </div>
-  );
+  )
 }
